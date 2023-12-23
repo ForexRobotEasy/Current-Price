@@ -1,0 +1,63 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                                   Current Price |
+//|                                 Developer's Site: forexroboteasy.com |
+//|                                       Development: Forex Robot Easy Team |
+//+------------------------------------------------------------------+
+
+#property strict
+
+//+------------------------------------------------------------------+
+//| Global Variables                                                  |
+//+------------------------------------------------------------------+
+int font_size = 12;
+string font_name = 'Arial';
+bool hide_pipette = false;
+
+//+------------------------------------------------------------------+
+//| Custom Indicator Initialization Function                          |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   // Set the indicator's buffer
+   SetIndexBuffer(0, spread);
+
+   // Set the indicator's label
+   ObjectCreate('SpreadLabel', OBJ_LABEL, 0, 0, 0);
+   ObjectSet('SpreadLabel', OBJPROP_XDISTANCE, 20);
+   ObjectSet('SpreadLabel', OBJPROP_YDISTANCE, 40);
+   ObjectSet('SpreadLabel', OBJPROP_COLOR, clrWhite);
+   ObjectSet('SpreadLabel', OBJPROP_FONTSIZE, font_size);
+   ObjectSet('SpreadLabel', OBJPROP_FONT, font_name);
+
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom Indicator Deinitialization Function                        |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   // Remove the indicator's label
+   ObjectDelete('SpreadLabel');
+}
+
+//+------------------------------------------------------------------+
+//| Custom Indicator Calculation Function                             |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total, const int prev_calculated, const datetime &time[], const double &open[], const double &high[], const double &low[], const double &close[], const long &tick_volume[], const long &volume[], const int &spread[])
+{
+   // Get the current spread
+   double current_spread = MarketInfo(Symbol(), MODE_SPREAD);
+
+   // Set the indicator value
+   IndicatorSetDouble(0, 0, current_spread);
+
+   // Set the indicator label text
+   string label_text = 'Spread: ' + DoubleToString(current_spread, 1);
+   if (hide_pipette)
+      label_text = StringSubstr(label_text, 0, StringLen(label_text) - 1) + '<sup>' + StringSubstr(label_text, -1) + '</sup>';
+   ObjectSetText('SpreadLabel', label_text);
+
+   return(rates_total);
+}
